@@ -12,4 +12,6 @@ package Conexao;
  */
 public class conecta {
     
+   //d;
+    
 }
