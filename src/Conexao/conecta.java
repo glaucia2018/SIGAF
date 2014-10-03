@@ -6,12 +6,28 @@
 
 package Conexao;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+
+
 /**
  *
  * @author GUSTAVO
  */
 public class conecta {
     
-   //d;
-    //HKJKJKKDSDADA
+ public static Connection getConexao() throws Exception{
+     try{
+         Class.forName("com.mysql.jdbc.Driver");
+         System.out.println("conectei");
+         return (DriverManager.getConnection("jdbc:mysql://localhost/sigaf", "root", "123456"));
+         
+     }catch(ClassNotFoundException e){
+         throw new SQLException(e.getMessage());
+         
+     }
 }
+}
+
