@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package Interface;
+package Visao;
 
 /**
  *
@@ -17,7 +17,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
      */
     public TelaPrincipal() {
         initComponents();
-        setContentPane(new fundo());
+        setContentPane(new Fundo());
         setExtendedState(this.MAXIMIZED_BOTH);
     }
 

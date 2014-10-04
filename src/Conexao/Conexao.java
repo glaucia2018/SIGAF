@@ -16,7 +16,7 @@ import java.sql.SQLException;
  *
  * @author GUSTAVO
  */
-public class conecta {
+public class Conexao {
     
  public static Connection getConexao() throws Exception{
      try{

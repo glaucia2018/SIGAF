@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package Interface;
+package Visao;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -20,12 +20,12 @@ import javax.imageio.ImageIO;
  *
  * @author GUSTAVO
  */
-public class fundo extends javax.swing.JPanel {
+public class Fundo extends javax.swing.JPanel {
     
     BufferedImage b;
     Rectangle2D rect;
     
-    public fundo(){
+    public Fundo(){
         try{
             b = ImageIO.read(new File("C://SIGAF//fundo.jpg"));
             rect = new Rectangle(0, 0, 2000, 1024);
