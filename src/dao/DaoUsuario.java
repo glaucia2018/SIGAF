@@ -37,7 +37,7 @@ public class DaoUsuario implements IDao<Usuario> {
     @Override
     public void incluir(Usuario objeto) throws SQLException {
         String sql = "INSERT INTO usuario (nome, dtcadastro, dtnascimento, senha,email,"
-                + "sexo, observacao) VALUES(?,?,?,?,?,?,?)";
+                + "sexo, observacao, estado) VALUES (?,?,?,?,?,?,?,?)";
         
         try{
             try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
@@ -48,8 +48,9 @@ public class DaoUsuario implements IDao<Usuario> {
                 stmt.setString(5,objeto.getEmail());
                 stmt.setString(6,objeto.getSexo());
                 stmt.setString(7, objeto.getObservacao());
+                stmt.setBoolean(8, objeto.isEstado());
                 
-                stmt.execute(sql);
+                stmt.execute();
             }
         }catch(SQLException e){
             System.out.println("Erro "+e);

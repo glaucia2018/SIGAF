@@ -3,11 +3,18 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package Visao;
 
+import Logico.EncriptaSenha;
 import Logico.Usuario;
 import dao.DaoUsuario;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -18,13 +25,18 @@ public class TelaUsuario extends javax.swing.JDialog {
     /**
      * Creates new form TelaUsuario
      */
+    DefaultTableModel tmUsuario = new DefaultTableModel(null, new String[]{"Nome", "Email"});
+    List<Usuario> lista;
+    ListSelectionModel lsmUsuario;
+
     public TelaUsuario(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         confTela(parent);
-        
+
     }
-    private void confTela(java.awt.Frame parent){
+
+    private void confTela(java.awt.Frame parent) {
         this.setLocationRelativeTo(parent);
     }
 
@@ -44,7 +56,7 @@ public class TelaUsuario extends javax.swing.JDialog {
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        jTTabela = new javax.swing.JTable();
         jPFicha = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jTIdusuario = new javax.swing.JTextField();
@@ -110,18 +122,16 @@ public class TelaUsuario extends javax.swing.JDialog {
 
         jTabbedPane1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+        jTTabela.setModel(tmUsuario);
+        jScrollPane1.setViewportView(jTTabela);
+        JTTabela.addMouseListener(new MouseAdapter(){
+            public void mouseClicked(MouseEvent e){
+                if(e.getClickCount() == 2){
+                    tabelaLinhaSelecionada(JTTabela);
+                    tabbedPane1.setSelectedIndex(1);
+                }
             }
-        ));
-        jScrollPane1.setViewportView(jTable1);
+        });
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -276,12 +286,27 @@ public class TelaUsuario extends javax.swing.JDialog {
 
         jBEditar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icone/edit.png"))); // NOI18N
         jBEditar.setText("Editar");
+        jBEditar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBEditarActionPerformed(evt);
+            }
+        });
 
         jBSalvar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icone/save.png"))); // NOI18N
         jBSalvar.setText("Salvar");
+        jBSalvar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBSalvarActionPerformed(evt);
+            }
+        });
 
         jBCancelar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icone/cancel.png"))); // NOI18N
         jBCancelar.setText("Cancelar");
+        jBCancelar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBCancelarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -358,11 +383,11 @@ public class TelaUsuario extends javax.swing.JDialog {
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel8Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jBPrimeiro, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jBAnterior, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jBProximo, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jBUltimo, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jBAnterior, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jBUltimo, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jBProximo, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -392,9 +417,55 @@ public class TelaUsuario extends javax.swing.JDialog {
         //Inclusao de novo usuario
         BotaoAcao bt = new BotaoAcao(this);
         bt.AtivaCampos();
-       
-        
+        jTIdusuario.setEnabled(false);
+        jTabbedPane1.setSelectedIndex(1);
+
+
     }//GEN-LAST:event_jBIncluirActionPerformed
+
+    private void jBCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBCancelarActionPerformed
+        // Cancela ação do usuario
+        BotaoAcao bt = new BotaoAcao(this);
+        bt.DesativaCampos();
+    }//GEN-LAST:event_jBCancelarActionPerformed
+
+    private void jBEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBEditarActionPerformed
+        //Edita os dados do Usuario
+        BotaoAcao bt = new BotaoAcao(this);
+        bt.AtivaCampos();
+        jTIdusuario.setEnabled(false);
+    }//GEN-LAST:event_jBEditarActionPerformed
+
+    private void jBSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBSalvarActionPerformed
+        // Grava os dados do Usuario
+        Usuario usuario = new Usuario();
+        DaoUsuario dao = new DaoUsuario();
+        BotaoAcao bt = new BotaoAcao(this);
+        if (jTIdusuario.getText().equals("")) {
+            usuario.setNome(jTNome.getText());
+            usuario.setDtcadastro(jDtCadastro.getDate());
+            usuario.setDtnascimento(jDtNascimento.getDate());
+            usuario.setEmail(jTEmail.getText());
+            usuario.setObservacao(jTAObservacao.getText());
+            usuario.setSenha(EncriptaSenha.encripta(new String(jPSenha.getPassword())));
+            usuario.setSexo((String) jCSexo.getSelectedItem());
+            usuario.setEstado(true);
+
+            try {
+                dao.incluir(usuario);
+                JOptionPane.showMessageDialog(null, "Usuário cadastrado com sucesso!", "Confirmação!", 1);
+                bt.LimpaCampos();
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(null, "Erro ao gravar dados!", "Atenção!", 1);
+                System.out.println("Gravacao de usuario " + ex);
+                bt.LimpaCampos();
+                Logger.getLogger(TelaUsuario.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        } else {
+
+        }
+    }//GEN-LAST:event_jBSalvarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -437,47 +508,99 @@ public class TelaUsuario extends javax.swing.JDialog {
             }
         });
     }
-       public  javax.swing.JButton getjBCancelar(){
-           return jBCancelar;
-       }
-     public javax.swing.JButton getjBEditar(){
-      return jBEditar;   
-     }
-    public javax.swing.JButton getjBIncluir(){
+    
+    public void ListarUsuario(){
+        DaoUsuario dao = new DaoUsuario();
+        Usuario usuario = new Usuario();
+        
+        String pesquisa = "%"+jTPesquisa.getText()+"%";
+        usuario.setNome(pesquisa);
+        try {
+            lista = dao.pesquisar(usuario);
+        } catch (SQLException ex) {
+            Logger.getLogger(TelaUsuario.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
+    
+    
+
+    public javax.swing.JButton getjBCancelar() {
+        return jBCancelar;
+    }
+
+    public javax.swing.JButton getjBEditar() {
+        return jBEditar;
+    }
+
+    public javax.swing.JButton getjBIncluir() {
         return jBIncluir;
     }
-     public javax.swing.JButton getjBSalvar(){
-         return jBSalvar;
-     }
 
-     public javax.swing.JComboBox getjCSexo(){
-         return jCSexo;
-     }
-    public javax.swing.JCheckBox getjChAtivo(){
+    public javax.swing.JButton getjBSalvar() {
+        return jBSalvar;
+    }
+
+    public javax.swing.JButton getjBPrimeiro() {
+        return jBPrimeiro;
+    }
+
+    public javax.swing.JButton getjBProximo() {
+        return jBProximo;
+    }
+
+    public javax.swing.JButton getjBUltimo() {
+        return jBUltimo;
+    }
+
+    public javax.swing.JButton getjBAnterior() {
+        return jBAnterior;
+    }
+
+    public javax.swing.JComboBox getjCSexo() {
+        return jCSexo;
+    }
+
+    public javax.swing.JCheckBox getjChAtivo() {
         return jChAtivo;
     }
-    public com.toedter.calendar.JDateChooser getjDtCadastro(){
+
+    public com.toedter.calendar.JDateChooser getjDtCadastro() {
         return jDtCadastro;
     }
-    public com.toedter.calendar.JDateChooser getjDtNascimento(){
+
+    public com.toedter.calendar.JDateChooser getjDtNascimento() {
         return jDtNascimento;
     }
-      public javax.swing.JTextField getjTEmail(){
-          return jTEmail;
-      }
-    public javax.swing.JTextField getjTIdusuario(){
+
+    public javax.swing.JTextField getjTEmail() {
+        return jTEmail;
+    }
+
+    public javax.swing.JTextField getjTIdusuario() {
         return jTIdusuario;
     }
-    public javax.swing.JTextField getjTNome(){
+
+    public javax.swing.JTextField getjTNome() {
         return jTNome;
     }
-    public javax.swing.JTextArea getjTAObservacao(){
+
+    public javax.swing.JTextArea getjTAObservacao() {
         return jTAObservacao;
     }
-    public javax.swing.JPanel getjPFicha(){
+
+    public javax.swing.JPanel getjPFicha() {
         return jPFicha;
     }
-   
+
+    public javax.swing.JTabbedPane getjTabbedPane1() {
+        return jTabbedPane1;
+    }
+
+    public javax.swing.JTable getjTTabela() {
+        return jTTabela;
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBAnterior;
     private javax.swing.JButton jBCancelar;
@@ -514,7 +637,7 @@ public class TelaUsuario extends javax.swing.JDialog {
     private javax.swing.JTextField jTIdusuario;
     private javax.swing.JTextField jTNome;
     private javax.swing.JTextField jTPesquisa;
+    private javax.swing.JTable jTTabela;
     private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables
 }

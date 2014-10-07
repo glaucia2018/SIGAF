@@ -16,6 +16,15 @@ public class Usuario {
    private int idusuario;
    private String nome,email,observacao,senha,sexo;
    private Date dtcadastro, dtnascimento;
+   private boolean estado;
+
+    public boolean isEstado() {
+        return estado;
+    }
+
+    public void setEstado(boolean estado) {
+        this.estado = estado;
+    }
    
 
     public int getIdusuario() {
