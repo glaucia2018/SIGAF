@@ -96,6 +96,9 @@
               <Dimension value="[59, 27]"/>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="jTPesquisaKeyPressed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>
@@ -168,8 +171,11 @@
                           <Connection code="tmUsuario" type="code"/>
                         </Property>
                       </Properties>
+                      <Events>
+                        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jTTabelaMouseClicked"/>
+                      </Events>
                       <AuxValues>
-                        <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="JTTabela.addMouseListener(new MouseAdapter(){&#xa;      public void mouseClicked(MouseEvent e){&#xa;        if(e.getClickCount() == 2){&#xa;           tabelaLinhaSelecionada(JTTabela);&#xa;           tabbedPane1.setSelectedIndex(1);&#xa;        }&#xa;      }&#xa;     });"/>
+                        <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="jTTabela.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);&#xa;lsmUsuario = jTTabela.getSelectionModel();&#xa;lsmUsuario.addListSelectionListener(new ListSelectionListener() {&#xa;public void valueChanged(ListSelectionEvent e){&#xa;  if (! e.getValueIsAdjusting()){&#xa;        //jTTabelaMouseClicked(e);&#xa;        tabelaLinhaSelecionada(jTTabela);&#xa;        jTabbedPane1.setSelectedIndex(1);}}&#xa;});"/>
                       </AuxValues>
                     </Component>
                   </SubComponents>

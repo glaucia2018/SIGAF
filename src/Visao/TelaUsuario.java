@@ -8,12 +8,18 @@ package Visao;
 import Logico.EncriptaSenha;
 import Logico.Usuario;
 import dao.DaoUsuario;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -98,6 +104,11 @@ public class TelaUsuario extends javax.swing.JDialog {
 
         jTPesquisa.setToolTipText("Para pesquisar digite um Nome e aperte Enter");
         jTPesquisa.setPreferredSize(new java.awt.Dimension(59, 27));
+        jTPesquisa.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jTPesquisaKeyPressed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPPesquisaLayout = new javax.swing.GroupLayout(jPPesquisa);
         jPPesquisa.setLayout(jPPesquisaLayout);
@@ -123,14 +134,20 @@ public class TelaUsuario extends javax.swing.JDialog {
         jTabbedPane1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 
         jTTabela.setModel(tmUsuario);
-        jScrollPane1.setViewportView(jTTabela);
-        JTTabela.addMouseListener(new MouseAdapter(){
-            public void mouseClicked(MouseEvent e){
-                if(e.getClickCount() == 2){
-                    tabelaLinhaSelecionada(JTTabela);
-                    tabbedPane1.setSelectedIndex(1);
-                }
+        jTTabela.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTTabelaMouseClicked(evt);
             }
+        });
+        jScrollPane1.setViewportView(jTTabela);
+        jTTabela.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        lsmUsuario = jTTabela.getSelectionModel();
+        lsmUsuario.addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e){
+                if (! e.getValueIsAdjusting()){
+                    //jTTabelaMouseClicked(e);
+                    tabelaLinhaSelecionada(jTTabela);
+                    jTabbedPane1.setSelectedIndex(1);}}
         });
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
@@ -427,12 +444,15 @@ public class TelaUsuario extends javax.swing.JDialog {
         // Cancela ação do usuario
         BotaoAcao bt = new BotaoAcao(this);
         bt.DesativaCampos();
+        bt.LimpaCampos();
+        bt.setNavegacao();
     }//GEN-LAST:event_jBCancelarActionPerformed
 
     private void jBEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBEditarActionPerformed
         //Edita os dados do Usuario
         BotaoAcao bt = new BotaoAcao(this);
         bt.AtivaCampos();
+        bt.setEdicao();
         jTIdusuario.setEnabled(false);
     }//GEN-LAST:event_jBEditarActionPerformed
 
@@ -455,17 +475,35 @@ public class TelaUsuario extends javax.swing.JDialog {
                 dao.incluir(usuario);
                 JOptionPane.showMessageDialog(null, "Usuário cadastrado com sucesso!", "Confirmação!", 1);
                 bt.LimpaCampos();
+                bt.setNavegacao();
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(null, "Erro ao gravar dados!", "Atenção!", 1);
                 System.out.println("Gravacao de usuario " + ex);
                 bt.LimpaCampos();
+                bt.setNavegacao();
                 Logger.getLogger(TelaUsuario.class.getName()).log(Level.SEVERE, null, ex);
             }
 
         } else {
-
+            AlteraUsuario();
         }
     }//GEN-LAST:event_jBSalvarActionPerformed
+
+    private void jTPesquisaKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTPesquisaKeyPressed
+        //PESQUISA USUARIO
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            ListarUsuario();
+        }
+    }//GEN-LAST:event_jTPesquisaKeyPressed
+
+    private void jTTabelaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTTabelaMouseClicked
+        // TODO add your handling code here:
+        if (evt.getClickCount() == 2) {
+            jTabbedPane1.setSelectedIndex(1);
+            tabelaLinhaSelecionada(jTTabela);
+            //jTabbedPane1.setSelectedIndex(1);
+        }
+    }//GEN-LAST:event_jTTabelaMouseClicked
 
     /**
      * @param args the command line arguments
@@ -508,22 +546,91 @@ public class TelaUsuario extends javax.swing.JDialog {
             }
         });
     }
-    
-    public void ListarUsuario(){
+
+    public void AlteraUsuario() {
+        Usuario usuario = new Usuario();
+        BotaoAcao bt = new BotaoAcao(this);
+
+        usuario.setNome(jTNome.getText());
+        usuario.setDtcadastro(jDtCadastro.getDate());
+        usuario.setDtnascimento(jDtNascimento.getDate());
+        usuario.setEmail(jTEmail.getText());
+        usuario.setObservacao(jTAObservacao.getText());
+        usuario.setSenha(EncriptaSenha.encripta(new String(jPSenha.getPassword())));
+        usuario.setSexo((String) jCSexo.getSelectedItem());
+        if (jChAtivo.isSelected()) {
+            usuario.setEstado(true);
+        } else {
+            usuario.setEstado(false);
+        }
+        DaoUsuario dao = new DaoUsuario();
+        try {
+            dao.editar(usuario);
+            JOptionPane.showMessageDialog(null, "Registro editado com sucesso!", "Confirmação!", 1);
+            bt.LimpaCampos();
+            bt.setNavegacao();
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Erro ao gravar dados!", "Atenção!", 0);
+            Logger.getLogger(TelaUsuario.class.getName()).log(Level.SEVERE, null, ex);
+            bt.LimpaCampos();
+            bt.setEdicao();
+            bt.setNavegacao();
+
+        }
+
+    }
+
+    public void ListarUsuario() {
         DaoUsuario dao = new DaoUsuario();
         Usuario usuario = new Usuario();
-        
-        String pesquisa = "%"+jTPesquisa.getText()+"%";
+
+        String pesquisa = "%" + jTPesquisa.getText() + "%";
         usuario.setNome(pesquisa);
         try {
             lista = dao.pesquisar(usuario);
+            MostraPesquisa(lista);
         } catch (SQLException ex) {
             Logger.getLogger(TelaUsuario.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
     }
-    
-    
+
+    public void MostraPesquisa(List<Usuario> usuario) {
+        while (tmUsuario.getRowCount() > 0) {
+            tmUsuario.removeRow(0);
+        }
+        if (!usuario.isEmpty()) {
+            String[] linha = new String[]{null, null};
+            for (int i = 0; i < usuario.size(); i++) {
+                tmUsuario.addRow(linha);
+                tmUsuario.setValueAt(usuario.get(i).getNome(), i, 0);
+                tmUsuario.setValueAt(usuario.get(i).getEmail(), i, 1);
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Usuário não cadastrado!", "Atenção!", 0);
+        }
+
+    }
+
+    public void tabelaLinhaSelecionada(JTable tabela) {
+        BotaoAcao bt = new BotaoAcao(this);
+        if (jTTabela.getSelectedRow() != -1) {
+            jTIdusuario.setText(String.valueOf(lista.get(tabela.getSelectedRow()).getIdusuario()));
+            jTNome.setText(lista.get(tabela.getSelectedRow()).getNome());
+            jTEmail.setText(lista.get(tabela.getSelectedRow()).getEmail());
+            jTAObservacao.setText(lista.get(tabela.getSelectedRow()).getObservacao());
+            jPSenha.setText(lista.get(tabela.getSelectedRow()).getSenha());
+            jCSexo.setSelectedItem(lista.get(tabela.getSelectedRow()).getSexo());
+            jChAtivo.setSelected(lista.get(tabela.getSelectedRow()).isEstado());
+            jDtCadastro.setDate(lista.get(tabela.getSelectedRow()).getDtcadastro());
+            jDtNascimento.setDate(lista.get(tabela.getSelectedRow()).getDtnascimento());
+
+            bt.setNavegacao();
+        } else {
+            bt.LimpaCampos();
+        }
+
+    }
 
     public javax.swing.JButton getjBCancelar() {
         return jBCancelar;
