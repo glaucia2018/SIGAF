@@ -51,7 +51,7 @@ public class DaoUsuario implements IDao<Usuario> {
                 stmt.setBoolean(8, objeto.isEstado());
 
                 stmt.execute();
-            }
+            } 
         } catch (SQLException e) {
             System.out.println("Erro " + e);
         }
