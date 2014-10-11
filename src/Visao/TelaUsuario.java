@@ -485,12 +485,14 @@ public class TelaUsuario extends javax.swing.JDialog {
             }
 
         } else {
+            System.out.println("passou aqui");
             AlteraUsuario();
         }
     }//GEN-LAST:event_jBSalvarActionPerformed
 
     private void jTPesquisaKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTPesquisaKeyPressed
         //PESQUISA USUARIO
+      
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             ListarUsuario();
         }
@@ -550,21 +552,22 @@ public class TelaUsuario extends javax.swing.JDialog {
     public void AlteraUsuario() {
         Usuario usuario = new Usuario();
         BotaoAcao bt = new BotaoAcao(this);
-
+       if(jTTabela.getSelectedRow()!= -1){
         usuario.setNome(jTNome.getText());
         usuario.setDtcadastro(jDtCadastro.getDate());
         usuario.setDtnascimento(jDtNascimento.getDate());
         usuario.setEmail(jTEmail.getText());
         usuario.setObservacao(jTAObservacao.getText());
-        usuario.setSenha(EncriptaSenha.encripta(new String(jPSenha.getPassword())));
+        usuario.setSenha(EncriptaSenha.encripta(new String(jPSenha.getPassword())));     
         usuario.setSexo((String) jCSexo.getSelectedItem());
         if (jChAtivo.isSelected()) {
             usuario.setEstado(true);
         } else {
             usuario.setEstado(false);
         }
-        DaoUsuario dao = new DaoUsuario();
+        
         try {
+            DaoUsuario dao = new DaoUsuario();
             dao.editar(usuario);
             JOptionPane.showMessageDialog(null, "Registro editado com sucesso!", "Confirmação!", 1);
             bt.LimpaCampos();
@@ -577,6 +580,7 @@ public class TelaUsuario extends javax.swing.JDialog {
             bt.setNavegacao();
 
         }
+       }
 
     }
 

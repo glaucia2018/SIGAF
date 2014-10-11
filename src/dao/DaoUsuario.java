@@ -60,22 +60,22 @@ public class DaoUsuario implements IDao<Usuario> {
 
     @Override
     public void editar(Usuario objeto) throws SQLException {
-       String sql = "UPDATE usuario SET nome =?, dtcadastro = ?, dtnascimento =? , senha = ?"
+       String sql = "UPDATE usuario SET nome =?, dtcadastro = ?, dtnascimento =?, senha =?"
                + ",email = ?,sexo = ?, observacao = ?, estado =? WHERE idusuario = ? ";
        try{
-           PreparedStatement stmt = conexao.prepareStatement(sql);
-                stmt.setString(1, objeto.getNome());
-                stmt.setDate(2, Anulavel.getData(objeto.getDtcadastro()));
-                stmt.setDate(3, Anulavel.getData(objeto.getDtnascimento()));
-                stmt.setString(4, objeto.getSenha());
-                stmt.setString(5, objeto.getEmail());
-                stmt.setString(6, objeto.getSexo());
-                stmt.setString(7, objeto.getObservacao());
-                stmt.setBoolean(8, objeto.isEstado());
-                stmt.setInt(9, objeto.getIdusuario());
-                
-                stmt.execute();
-                //stmt.close();
+           try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+               stmt.setString(1, objeto.getNome());
+               stmt.setDate(2, Anulavel.getData(objeto.getDtcadastro()));
+               stmt.setDate(3, Anulavel.getData(objeto.getDtnascimento()));
+               stmt.setString(4, objeto.getSenha());
+               stmt.setString(5, objeto.getEmail());
+               stmt.setString(6, objeto.getSexo());
+               stmt.setString(7, objeto.getObservacao());
+               stmt.setBoolean(8, objeto.isEstado());
+               stmt.setInt(9, objeto.getIdusuario());
+               
+               stmt.execute();
+           }
        }catch(SQLException e){
            System.out.println("Erro ao gravar "+e);
            
